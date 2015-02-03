@@ -3,6 +3,7 @@
 #include "render.h"
 #include "array.h"
 #include "log.h"
+#include "math3d.h"
 
 static struct render *
 render(lua_State *L) {
@@ -59,6 +60,14 @@ linit(lua_State *L) {
 	if (R == NULL) {
 		return luaL_error(L, "init render device failed");
 	}
+
+	render_setdepth(R, DEPTH_LESS);
+	render_enabledepthmask(R, 1);
+	render_setcull(R, CULL_BACK);
+	render_clear(R, MASKD, 0);
+
+	render_setblend(R, BLEND_DISABLE, BLEND_DISABLE);
+
 	return 1;
 }
 
@@ -331,6 +340,88 @@ lbind(lua_State *L) {
 	return 0;
 }
 
+static int
+llocuniform(lua_State *L) {
+	struct render *R = render(L);
+	const char *name = luaL_checkstring(L,2);
+	int loc = render_shader_locuniform(R, name);
+	if (loc >= 0) {
+		lua_pushinteger(L, loc);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+static int
+lsetuniform_float(lua_State *L) {
+	enum UNIFORM_FORMAT format;
+	int top = lua_gettop(L);
+	switch(top) {
+	case 3:
+		format = UNIFORM_FLOAT1;
+		break;
+	case 4:
+		format = UNIFORM_FLOAT2;
+		break;
+	case 5:
+		format = UNIFORM_FLOAT3;
+		break;
+	case 6:
+		format = UNIFORM_FLOAT4;
+		break;
+	default:
+		return luaL_error(L, "Only support 1,2,3,4 floats");
+	}
+	struct render *R = render(L);
+	int loc = luaL_checkinteger(L, 2);
+	float v[4];
+	int i;
+	for (i=3;i<=top;i++) {
+		v[i-3] = luaL_checknumber(L, i);
+	}
+	render_shader_setuniform(R, loc, format, v);
+
+	return 0;
+}
+
+static int
+lsetuniform_vector3(lua_State *L) {
+	struct render *R = render(L);
+	int loc = luaL_checkinteger(L, 2);
+	float *v = lua_touserdata(L,3);
+	render_shader_setuniform(R, loc, UNIFORM_FLOAT3, v);
+	return 0;
+}
+
+static int
+lsetuniform_vector4(lua_State *L) {
+	struct render *R = render(L);
+	int loc = luaL_checkinteger(L, 2);
+	float *v = lua_touserdata(L,3);
+	render_shader_setuniform(R, loc, UNIFORM_FLOAT4, v);
+	return 0;
+}
+
+static int
+lsetuniform_matrix(lua_State *L) {
+	struct render *R = render(L);
+	int loc = luaL_checkinteger(L, 2);
+	float *v = lua_touserdata(L,3);
+	render_shader_setuniform(R, loc, UNIFORM_FLOAT44, v);
+	return 0;
+}
+
+static int
+lsetuniform_matrix33(lua_State *L) {
+	struct render *R = render(L);
+	int loc = luaL_checkinteger(L, 2);
+	union matrix44 *mat = lua_touserdata(L,3);
+	float n33[9];
+	render_shader_setuniform(R, loc, UNIFORM_FLOAT33, matrix44_to33(mat, n33));
+	return 0;
+}
+
 int
 luaopen_ejoy3d_render(lua_State *L) {
 	luaL_Reg l[] = {
@@ -348,6 +439,12 @@ luaopen_ejoy3d_render(lua_State *L) {
 		{ "draw", ldraw },
 		{ "viewport", lviewport },
 		{ "bind", lbind },
+		{ "locuniform", llocuniform },
+		{ "setuniform_float", lsetuniform_float },
+		{ "setuniform_vector3", lsetuniform_vector3 },
+		{ "setuniform_vector4", lsetuniform_vector4 },
+		{ "setuniform_matrix33", lsetuniform_matrix33 },
+		{ "setuniform_matrix", lsetuniform_matrix },
 		{ NULL, NULL },
 	};
 

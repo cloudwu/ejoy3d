@@ -228,7 +228,7 @@ vector3(lua_State *L) {
 		{ "copy", lvec3_copy },
 		{ "rotation", lvec3_rotation },
 		{ "lerp", lvec3_lerp },
-		{ "tansmat", lvec3_transmat },
+		{ "transmat", lvec3_transmat },
 		{ "scalemat", lvec3_scalemat },
 		{ "rotmat", lvec3_rotmat },
 		{ "rotaxis", lvec3_rotaxis },
@@ -477,13 +477,17 @@ lmat_mul(lua_State *L) {
 	union matrix44 *m = lua_touserdata(L, 1);
 	union matrix44 *a = lua_touserdata(L, 2);
 	union matrix44 *b = lua_touserdata(L, 3);
+	if (b == NULL) {
+		b = a;
+		a = m;
+	}
 	matrix44_mul(m,a,b);
 	lua_settop(L,1);
 	return 1;
 }
 
 static int
-lmat_mul43(lua_State *L) {
+lmat_fastmul43(lua_State *L) {
 	union matrix44 *m = lua_touserdata(L, 1);
 	union matrix44 *a = lua_touserdata(L, 2);
 	union matrix44 *b = lua_touserdata(L, 3);
@@ -556,7 +560,7 @@ matrix(lua_State *L) {
 		{ "perspective", lmat_perspective },
 		{ "ortho", lmat_ortho },
 		{ "mul", lmat_mul },
-		{ "mul43", lmat_mul43 },
+		{ "fastmul43", lmat_fastmul43 },
 		{ "transposed", lmat_transposed },
 		{ "determinant", lmat_determinant },
 		{ "inverted", lmat_inverted },

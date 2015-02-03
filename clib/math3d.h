@@ -538,6 +538,15 @@ matrix44_decompose(const union matrix44 *m, struct vector3 *trans, struct vector
 	}
 }
 
+static inline float *
+matrix44_to33(const union matrix44 *m, float m33[9]) {
+	m33[0] = C[0][0]; m33[1] = C[0][1]; m33[2] = C[0][2];
+	m33[3] = C[1][0]; m33[4] = C[1][1]; m33[5] = C[1][2];
+	m33[6] = C[2][0]; m33[7] = C[2][1]; m33[8] = C[2][2];
+
+	return m33;
+}
+
 #undef C
 
 // plane
