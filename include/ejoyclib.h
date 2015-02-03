@@ -5,5 +5,6 @@
 
 int luaopen_ejoy3d_render(lua_State *L);
 int luaopen_ejoy3d_glfw(lua_State *L);
+int luaopen_ejoy3d_math3d(lua_State *L);
 
 #endif

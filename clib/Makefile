@@ -5,7 +5,8 @@ CSRC=\
 
 LUASRC=\
  librender.c\
- libglfw.c
+ libglfw.c\
+ libmath.c
 
 GLAD=\
  ../3rd/glad/src/glad.c

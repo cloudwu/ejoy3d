@@ -1,6 +1,12 @@
-render = require "ejoy3d.render"
-glfw = require "ejoy3d.glfw"
+local render = require "ejoy3d.render"
+local glfw = require "ejoy3d.glfw"
+local math3d = require "ejoy3d.math3d"
 
+local a = math3d.vector3(1,2,3)
+local b = math3d.vector3(4,5,6)
+print(math3d.vector3():cross(a,b):normalize())
+print(math3d.quaternion())
+print(math3d.matrix(0,0,0))
 FS = [[
 varying vec2 v_texcoord;
 uniform sampler2D texture0;
