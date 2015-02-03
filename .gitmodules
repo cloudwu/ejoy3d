@@ -1,0 +1,6 @@
+[submodule "3rd/lua"]
+	path = 3rd/lua
+	url = https://github.com/ejoy/lua.git
+[submodule "3rd/glfw"]
+	path = 3rd/glfw
+	url = https://github.com/glfw/glfw.git
