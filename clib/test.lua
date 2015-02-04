@@ -125,9 +125,7 @@ R = render.init {
 	target = 16,
 	texture = 128,
 	shader = 16,
-	log = function(msg)
-		print(msg)
-	end
+	log = error,
 }
 render.viewport(R, 0,0,640,480)
 
