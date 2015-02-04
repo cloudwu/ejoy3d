@@ -40,9 +40,8 @@ $(BUILD)/glad.o : 3rd/glad/src/glad.c | $(BUILD)
 $(BUILD)/libejoy3d.a : $(LIBOBJS) $(BUILD)/glad.o
 	$(AR) $@ $^
 
-$(BUILD)/$(STANDALONE) : SRCS=clib/standalone.c
-$(BUILD)/$(STANDALONE) : $(BUILD)/libejoy3d.a
-	$(CC) $(CFLAGS) -I$(LUAINC) -Iinclude -o $@ $(SRCS) -L$(BUILD) -lejoy3d $(LIBS)
+$(BUILD)/$(STANDALONE) : clib/standalone.c $(BUILD)/libejoy3d.a
+	$(CC) $(CFLAGS) -I$(LUAINC) -Iinclude -o $@ $< -L$(BUILD) -lejoy3d $(LIBS)
 
 clean :
 	rm -rf build

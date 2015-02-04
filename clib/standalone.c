@@ -17,8 +17,26 @@ require_ejoy3d(lua_State *L) {
 }
 
 static void
+set_path(lua_State *L) {
+	lua_getfield(L, -1, "config");
+	const char *config = lua_tostring(L,-1);
+	lua_pop(L,1);
+	char path[4];
+	char sep[4];
+	char pat[4];
+	int n = sscanf(config, "%4s\n%4s\n%4s\n",path,sep,pat);
+	if (n!=3) {
+		luaL_error(L, "Invalid pakcage.config");
+	}
+	lua_pushfstring(L, ".%slualib%s%s.lua%s.%slualib%s%s%sinit.lua",
+		path,path,pat,sep,path,path,pat,path);
+	lua_setfield(L, -2, "path");
+}
+
+static void
 disable_cloader(lua_State *L) {
 	lua_getglobal(L, "package");
+	set_path(L);
 	lua_pushnil(L);
 	lua_setfield(L, -2, "cpath");
 	lua_getfield(L, -1, "searchers");
