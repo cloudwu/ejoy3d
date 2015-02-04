@@ -51,7 +51,7 @@ static int
 pmain (lua_State *L) {
 	int argc = (int)lua_tointeger(L, 1);
 	char **argv = (char **)lua_touserdata(L, 2);
-	if (argc <= 1) {
+	if (argc < 2) {
 		return luaL_error(L, "Need filename");
 	}
 	luaL_openlibs(L);
@@ -59,14 +59,19 @@ pmain (lua_State *L) {
 	require_ejoy3d(L);
 	lua_createtable(L, argc - 2, 2);
 	int i;
-	for (i=0;i<=argc;i++) {
+	for (i=0;i<argc;i++) {
 		lua_pushstring(L, argv[i]);
 		lua_rawseti(L, -2, i-1);
 	}
 	lua_setglobal(L, "arg");
-	if (luaL_dofile(L, argv[1]) != LUA_OK) {
+	if (luaL_loadfile(L, argv[1]) != LUA_OK) {
 		lua_error(L);
 	}
+	luaL_checkstack(L, argc-2, "Memory overflow");
+	for (i=2;i<argc;i++) {
+		lua_pushstring(L, argv[i]);
+	}
+	lua_call(L, argc-2, 0);
 	return 0;
 }
 

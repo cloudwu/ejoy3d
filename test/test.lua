@@ -1,3 +1,4 @@
+print("args:",...)
 require "ejoy3d"
 local render = require "ejoy3d.render"
 local glfw = require "ejoy3d.glfw"
