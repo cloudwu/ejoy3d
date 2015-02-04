@@ -220,8 +220,12 @@ render.set(R, type.VERTEXBUFFER, vertex_buffer)
 render.setuniform_matrix33(R, loc_normalMatrix, normalMatrix)
 render.setuniform_matrix(R, loc_modelViewProjectionMatrix, modelViewProjectionMatrix)
 
+--render.depthmask(R, false)
+--render.setdepth(R,0)
+render.setcull(R,2)
+
 while not glfw.WindowShouldClose(window) do
-	render.clear(R, 'cd', 0)
+	render.clear(R, 'cd', 6)
 
 	render.draw(R,0,36)
 

@@ -61,14 +61,47 @@ linit(lua_State *L) {
 		return luaL_error(L, "init render device failed");
 	}
 
-	render_setdepth(R, DEPTH_LESS);
-	render_enabledepthmask(R, 1);
-	render_setcull(R, CULL_BACK);
-	render_clear(R, MASKD, 0);
-
-	render_setblend(R, BLEND_DISABLE, BLEND_DISABLE);
-
 	return 1;
+}
+
+static int
+lsetdepth(lua_State *L) {
+	struct render *R = render(L);
+	int d = luaL_optinteger(L, 2, 0);
+	render_setdepth(R, d);
+
+	return 0;
+}
+
+static int
+ldepthmask(lua_State *L) {
+	struct render *R = render(L);
+	int d = lua_toboolean(L, 2);
+	render_enabledepthmask(R, d);
+
+	return 0;
+}
+
+static int
+lsetcull(lua_State *L) {
+	struct render *R = render(L);
+	int c = luaL_optinteger(L, 2, 0);
+	render_setcull(R, c);
+
+	return 0;
+}
+
+static int
+lsetblend(lua_State *L) {
+	struct render *R = render(L);
+	if (lua_gettop(L) == 1) {
+		render_setblend(R, BLEND_DISABLE, BLEND_DISABLE);
+	} else {
+		int a = luaL_checkinteger(L, 2);
+		int b = luaL_checkinteger(L, 3);
+		render_setblend(R, a, b);
+	}
+	return 0;
 }
 
 static int
@@ -422,6 +455,47 @@ lsetuniform_matrix33(lua_State *L) {
 	return 0;
 }
 
+static int
+lresetstate(lua_State *L) {
+	struct render *R = render(L);
+	render_state_reset(R);
+
+	return 0;
+}
+
+static int
+lscissor(lua_State *L) {
+	struct render *R = render(L);
+	if (lua_isboolean(L, 2)) {
+		int e = lua_toboolean(L, 2);
+		render_enablescissor(R, e);
+	} else {
+		int x = luaL_checkinteger(L, 2);
+		int y = luaL_checkinteger(L, 3);
+		int w = luaL_checkinteger(L, 4);
+		int h = luaL_checkinteger(L, 5);
+		render_setscissor(R, x, y, w, h);
+	}
+	return 0;
+}
+
+static int
+ltarget_create(lua_State *L) {
+	struct render *R = render(L);
+	int width = luaL_checkinteger(L, 2);
+	int height = luaL_checkinteger(L, 3);
+	int format = luaL_checkinteger(L, 4);
+	RID targetid = render_target_create(R, width, height, format);
+	if (targetid == 0) {
+		return luaL_error(L, "Create render targer %d * %d (%d) failed", width, height, format);
+	}
+	RID tex = render_target_texture(R, targetid);
+	lua_pushinteger(L, targetid);
+	lua_pushinteger(L, tex);
+
+	return 2;
+}
+
 int
 luaopen_ejoy3d_render(lua_State *L) {
 	luaL_Reg l[] = {
@@ -435,6 +509,7 @@ luaopen_ejoy3d_render(lua_State *L) {
 		{ "texture_update", ltexture_update },
 		{ "buffer_create", lbuffer_create },
 		{ "buffer_update", lbuffer_update },
+		{ "target_create", ltarget_create },
 		{ "clear", lclear },
 		{ "draw", ldraw },
 		{ "viewport", lviewport },
@@ -445,6 +520,12 @@ luaopen_ejoy3d_render(lua_State *L) {
 		{ "setuniform_vector4", lsetuniform_vector4 },
 		{ "setuniform_matrix33", lsetuniform_matrix33 },
 		{ "setuniform_matrix", lsetuniform_matrix },
+		{ "setdepth", lsetdepth },
+		{ "depthmask", ldepthmask },
+		{ "setcull", lsetcull },
+		{ "setblend", lsetblend },
+		{ "resetstate", lresetstate },
+		{ "scissor", lscissor },
 		{ NULL, NULL },
 	};
 
