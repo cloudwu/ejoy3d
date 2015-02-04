@@ -64,7 +64,10 @@ pmain (lua_State *L) {
 		lua_rawseti(L, -2, i-1);
 	}
 	lua_setglobal(L, "arg");
-	return luaL_dofile(L, argv[1]);
+	if (luaL_dofile(L, argv[1]) != LUA_OK) {
+		lua_error(L);
+	}
+	return 0;
 }
 
 int

@@ -1,3 +1,4 @@
+require "ejoy3d"
 local render = require "ejoy3d.render"
 local glfw = require "ejoy3d.glfw"
 local math3d = require "ejoy3d.math3d"
