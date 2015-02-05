@@ -335,7 +335,7 @@ lclear(lua_State *L) {
 			break;
 		}
 	}
-	unsigned long argb = (unsigned long)luaL_checkinteger(L, 3);
+	unsigned long argb = (unsigned long)luaL_optinteger(L, 3, 0);
 	render_clear(R, maskbits, argb);
 
 	return 0;

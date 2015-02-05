@@ -21,4 +21,9 @@ E.texture = {
 	ETC1 = 9,
 }
 
+E.cull = {
+	FRONT = 1,
+	BACK = 2,
+}
+
 return E

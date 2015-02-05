@@ -1,5 +1,6 @@
 local render = require "ejoy3d.render"
 local shader = require "ejoy3d.shader"
+local texture = require "ejoy3d.texture"
 
 local ejoy3d = {}
 local R
@@ -34,7 +35,9 @@ function ejoy3d.start(config)
 	glfw.MakeContextCurrent(window)
 	glfw.SwapInterval(config.sync or 1)
 	create_device(config.render)
-	shader.init(R, config.shader_path or "./")
+	local path = config.asset_path or "./"
+	shader.init(R, config.shader_path or path)
+	texture.init(R, config.texture_path or path)
 
 	-- init (user defined)
 	if config.init then
