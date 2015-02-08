@@ -1,30 +1,18 @@
 local ejoy3d = require "ejoy3d"
 local shader = require "ejoy3d.shader"
 local texture = require "ejoy3d.texture"
-
-local math3d = require "ejoy3d.math3d"
-
+local matrix = require "ejoy3d.matrix"
 
 ---- camera
-
-local function projmat(fov, aspect, near, far)
-	local ymax = near * math.tan(fov * math.pi / 360)
-	local xmax = ymax * aspect
-	local mat = math3d.matrix()
-	return mat:perspective(-xmax, xmax, -ymax, ymax, near, far)
-end
-
-local modelViewMatrix = math3d.vector3(0,0,3):transmat(math3d.matrix())
-local rot = math3d.matrix(1,1,1)
+local modelViewMatrix = matrix.transmat(0,0,3)
+local rot = matrix.rotmat(1,1,1)
 modelViewMatrix:mul(rot, modelViewMatrix)
 
-local c_projmat = projmat(45, 4/3, 0.1, 100)
-local c_viewmat = math3d.matrix():inverted(modelViewMatrix)
+local c_projmat = matrix.projmat(45, 4/3, 0.1, 100)
+local c_viewmat = matrix.invmat(modelViewMatrix)
 
-local modelViewProjectionMatrix = math3d.matrix()
-modelViewProjectionMatrix:mul(c_projmat, c_viewmat)
-local normalMatrix = math3d.matrix(modelViewMatrix)
-normalMatrix:transposed()
+local modelViewProjectionMatrix = matrix.new():mul(c_projmat, c_viewmat)
+local normalMatrix = matrix.clone(modelViewMatrix):transposed()
 
 ------------
 
@@ -42,13 +30,8 @@ function game.init()
 		},
 	}
 	prog:bind()
-
-------------- todo
-	local R = ejoy3d.R
-
 	texture.default:bind(0)
 
-	-- 0 vertexbuffer 1 indexbuffer
 	local index_buffer = shader.index_buffer {
 		0, 1, 2,
 		2, 1, 3,
@@ -103,7 +86,7 @@ function game.init()
 		-0.5, 0.5, -0.5,        0.0, 0.0, -1.0,        0xffff,0xffff,
 	}
 
-	vertex_buffer:bind()
+	vertex_buffer:bind(0)	-- bind vb to slot 0
 
 	prog.normalMatrix = normalMatrix
 	prog.modelViewProjectionMatrix = modelViewProjectionMatrix
