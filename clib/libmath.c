@@ -550,8 +550,8 @@ static int
 lmat_decompose(lua_State *L) {
 	union matrix44 *m = check_userdata(L,1);
 	struct vector3 *trans = check_userdata(L,2);
-	struct vector3 *rot = check_userdata(L,2);
-	struct vector3 *scale = check_userdata(L,2);
+	struct vector3 *rot = check_userdata(L,3);
+	struct vector3 *scale = check_userdata(L,4);
 	matrix44_decompose(m, trans, rot, scale);
 	lua_settop(L, 4);
 	return 3;
