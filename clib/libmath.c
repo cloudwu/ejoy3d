@@ -205,8 +205,8 @@ lvec3_mul33(lua_State *L) {
 static int
 lvec3_distAABB(lua_State *L) {
 	struct vector3 *v = check_userdata(L,1);
-	struct vector3 *mins = check_userdata(L,1);
-	struct vector3 *maxs = check_userdata(L,1);
+	struct vector3 *mins = check_userdata(L,2);
+	struct vector3 *maxs = check_userdata(L,3);
 	float d = vector3_distAABB(v, mins, maxs);
 	lua_pushnumber(L,d);
 	return 1;
@@ -708,11 +708,11 @@ lraytriangle(lua_State *L) {
 		return luaL_error(L, "intersection.raytriangle(rayOrig,rayDir,p0,p1,p2,ret)");
 	}
 	struct vector3 *ro = check_userdata(L,1);
-	struct vector3 *rd = check_userdata(L,1);
-	struct vector3 *p0 = check_userdata(L,1);
-	struct vector3 *p1 = check_userdata(L,1);
-	struct vector3 *p2 = check_userdata(L,1);
-	struct vector3 *inst = check_userdata(L,1);
+	struct vector3 *rd = check_userdata(L,2);
+	struct vector3 *p0 = check_userdata(L,3);
+	struct vector3 *p1 = check_userdata(L,4);
+	struct vector3 *p2 = check_userdata(L,5);
+	struct vector3 *inst = check_userdata(L,6);
 	if (intersection_raytriangle(ro,rd,p0,p1,p2,inst) == NULL) {
 		return 0;
 	}
@@ -726,9 +726,9 @@ lrayAABB(lua_State *L) {
 		return luaL_error(L, "intersection.rayAABB(rayOrig,rayDir,mins,maxs)");
 	}
 	struct vector3 *ro = check_userdata(L,1);
-	struct vector3 *rd = check_userdata(L,1);
-	struct vector3 *mins = check_userdata(L,1);
-	struct vector3 *maxs = check_userdata(L,1);
+	struct vector3 *rd = check_userdata(L,2);
+	struct vector3 *mins = check_userdata(L,3);
+	struct vector3 *maxs = check_userdata(L,4);
 	int r = intersection_rayAABB(ro,rd,mins,maxs);
 	lua_pushboolean(L,r);
 	return 1;
