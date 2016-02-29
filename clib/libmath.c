@@ -689,12 +689,23 @@ lplane_dot3(lua_State *L) {
 	return 1;
 }
 
+static int
+lplane_normal(lua_State *L) {
+	struct plane *p = check_userdata(L, 1);
+	lua_pushnumber(L, p->normal.x);
+	lua_pushnumber(L, p->normal.y);
+	lua_pushnumber(L, p->normal.z);
+
+	return 3;
+}
+
 static void
 plane(lua_State *L) {
 	luaL_Reg l[] = {
 		{ "copy", lplane_copy },
 		{ "dist", lplane_dist },
 		{ "dot3", lplane_dot3 },
+		{ "normal", lplane_normal },
 		{ NULL, NULL },
 	};
 	create_meta(L, l, "plane", lplane_tostring);

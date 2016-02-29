@@ -103,21 +103,31 @@ do
 	local setcull = render.setcull
 	local e = enum.cull
 	function shader.setcull(mode)
-		return setcull(R, e[mode])
+		setcull(R, e[mode])
+	end
+end
+
+do
+	local setdepth = render.setdepth
+	local setdepthmask = render.depthmask
+	local e  = enum.depth
+	function shader.setdepth(mode, writing)
+		setdepthmask(R, writing)
+		setdepth(R, e[mode])
 	end
 end
 
 do
 	local draw = render.draw
 	function shader.draw(n)
-		return draw(R, 0, n)
+		draw(R, 0, n)
 	end
 end
 
 do
 	local clear = render.clear
 	function shader.clear(mode, argb)
-		return clear(R, mode, argb)
+		clear(R, mode, argb)
 	end
 end
 

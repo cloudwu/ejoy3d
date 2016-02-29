@@ -2,17 +2,8 @@ local ejoy3d = require "ejoy3d"
 local shader = require "ejoy3d.shader"
 local texture = require "ejoy3d.texture"
 local matrix = require "ejoy3d.matrix"
-
----- camera
-local modelViewMatrix = matrix.transmat(0,0,3)
-local rot = matrix.rotmat(1,1,1)
-modelViewMatrix:mul(rot, modelViewMatrix)
-
-local c_projmat = matrix.projmat(45, 4/3, 0.1, 100)
-local c_viewmat = matrix.invmat(modelViewMatrix)
-
-local modelViewProjectionMatrix = matrix.new():mul(c_projmat, c_viewmat)
-local normalMatrix = matrix.clone(modelViewMatrix):transposed()
+local asset = require "util.asset"
+local scene = require "ejoy3d.scene"
 
 ------------
 
@@ -20,13 +11,16 @@ local game = {
 	asset_path = "./test/",
 }
 
+local prog
+
 function game.init()
-	local prog = shader.load {
+	prog = shader.load {
 		vs = "test.vs",
 		fs = "test.fs",
 		uniform = {
-			modelViewProjectionMatrix = "matrix",
-			normalMatrix = "matrix33",
+			viewProjMat = "matrix",
+			worldMat = "matrix",
+			lightDir = "vector3",
 		},
 	}
 	prog:bind()
@@ -88,15 +82,18 @@ function game.init()
 
 	vertex_buffer:bind(0)	-- bind vb to slot 0
 
-	prog.normalMatrix = normalMatrix
-	prog.modelViewProjectionMatrix = modelViewProjectionMatrix
-	--render.depthmask(R, false)
-	--render.setdepth(R,0)
 	shader.setcull "BACK"
 end
 
+local t = 5
+local d = 0
+
 function game.update()
 	shader.clear 'cd'
+	prog.viewProjMat = scene.camera(t, 30)
+	prog.worldMat = matrix.rotmat(0,d,0)
+	d = d + 0.01
+	prog.lightDir = scene.lightdir(90, 60)
 	shader.draw(36)
 end
 

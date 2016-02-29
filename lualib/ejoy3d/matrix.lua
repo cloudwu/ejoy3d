@@ -8,7 +8,12 @@ local veccache = setmetatable({}, weak_mode)
 
 local get = table.remove
 function matrix.new()
-	return get(matcache) or math3d.matrix()
+	local tmp = get(matcache)
+	if tmp then
+		return tmp:identity()
+	else
+		return math3d.matrix()
+	end
 end
 
 function matrix.clone(m)

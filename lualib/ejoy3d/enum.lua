@@ -22,8 +22,19 @@ E.texture = {
 }
 
 E.cull = {
+	DISABLE = 0,
 	FRONT = 1,
 	BACK = 2,
+}
+
+E.depth = {
+	DISABLE = 0,
+	LESS_EQUAL = 1,
+	LESS = 2,
+	EQUAL = 3,
+	GREATER = 4,
+	GREATER_EQUAL = 5,
+	ALWAYS = 6,
 }
 
 return E
