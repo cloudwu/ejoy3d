@@ -8,12 +8,9 @@ local c_projmat = matrix.projmat(45, 4/3, 0.1, 100000)
 local t_camera = matrix.new()
 function scene.camera(height, pitch)
 	local alpha = pitch * math.pi / 180
-	local tmat = matrix.transmat(0,0,-height / math.tan(alpha))
-	local rmat = matrix.rotmat(alpha, 0,0)
-	t_camera:mul(tmat,rmat)
-	t_camera:mul(c_projmat, t_camera)
-	matrix.drop(rmat)
-	matrix.drop(tmat)
+	local tmp = matrix.new():rot(alpha,0,0):trans(0,0,-height / math.tan(alpha))
+	t_camera:mul(c_projmat, tmp)
+	matrix.drop(tmp)
 	return t_camera
 end
 

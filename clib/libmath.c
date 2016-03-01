@@ -151,7 +151,7 @@ static int
 lvec3_transmat(lua_State *L) {
 	struct vector3 *v = check_userdata(L,1);
 	union matrix44 *m = check_userdata(L,2);
-	matrix44_trans(m,v->x,v->y,v->z);
+	matrix44_transmat(m,v->x,v->y,v->z);
 	lua_settop(L,2);
 	return 1;
 }
@@ -160,7 +160,7 @@ static int
 lvec3_scalemat(lua_State *L) {
 	struct vector3 *v = check_userdata(L,1);
 	union matrix44 *m = check_userdata(L,2);
-	matrix44_scale(m,v->x,v->y,v->z);
+	matrix44_scalemat(m,v->x,v->y,v->z);
 	lua_settop(L,2);
 	return 1;
 }
@@ -169,7 +169,7 @@ static int
 lvec3_rotmat(lua_State *L) {
 	struct vector3 *v = check_userdata(L,1);
 	union matrix44 *m = check_userdata(L,2);
-	matrix44_rot(m,v->x,v->y,v->z);
+	matrix44_rotmat(m,v->x,v->y,v->z);
 	lua_settop(L,2);
 	return 1;
 }
@@ -522,14 +522,19 @@ lmat_determinant(lua_State *L) {
 static int
 lmat_inverted(lua_State *L) {
 	union matrix44 *m = check_userdata(L,1);
-	union matrix44 *from = check_userdata(L,2);
-	matrix44_inverted(m, from);
+	if (lua_isnoneornil(L, 2)) {
+		union matrix44 tmp = *m;
+		matrix44_inverted(m, &tmp);
+	} else {
+		union matrix44 *from = check_userdata(L,2);
+		matrix44_inverted(m, from);
+	}
 	lua_settop(L,1);
 	return 1;
 }
 
 static int
-lmat_trans(lua_State *L) {
+lmat_gettrans(lua_State *L) {
 	union matrix44 *m = check_userdata(L,1);
 	struct vector3 *v = check_userdata(L,2);
 	matrix44_gettrans(m,v);
@@ -538,7 +543,7 @@ lmat_trans(lua_State *L) {
 }
 
 static int
-lmat_scale(lua_State *L) {
+lmat_getscale(lua_State *L) {
 	union matrix44 *m = check_userdata(L,1);
 	struct vector3 *v = check_userdata(L,2);
 	matrix44_getscale(m,v);
@@ -557,6 +562,39 @@ lmat_decompose(lua_State *L) {
 	return 3;
 }
 
+static int
+lmat_trans(lua_State *L) {
+	union matrix44 *m = check_userdata(L,1);
+	float x = luaL_checknumber(L, 2);
+	float y = luaL_checknumber(L, 3);
+	float z = luaL_checknumber(L, 4);
+	matrix44_trans(m,x,y,z);
+	lua_settop(L,1);
+	return 1;
+}
+
+static int
+lmat_scale(lua_State *L) {
+	union matrix44 *m = check_userdata(L,1);
+	float x = luaL_checknumber(L, 2);
+	float y = luaL_checknumber(L, 3);
+	float z = luaL_checknumber(L, 4);
+	matrix44_scale(m,x,y,z);
+	lua_settop(L,1);
+	return 1;
+}
+
+static int
+lmat_rot(lua_State *L) {
+	union matrix44 *m = check_userdata(L,1);
+	float x = luaL_checknumber(L, 2);
+	float y = luaL_checknumber(L, 3);
+	float z = luaL_checknumber(L, 4);
+	matrix44_rot(m,x,y,z);
+	lua_settop(L,1);
+	return 1;
+}
+
 static void
 matrix(lua_State *L) {
 	luaL_Reg l[] = {
@@ -571,9 +609,12 @@ matrix(lua_State *L) {
 		{ "transposed", lmat_transposed },
 		{ "determinant", lmat_determinant },
 		{ "inverted", lmat_inverted },
+		{ "gettrans", lmat_gettrans },
+		{ "getscale", lmat_getscale },
+		{ "decompose", lmat_decompose },
 		{ "trans", lmat_trans },
 		{ "scale", lmat_scale },
-		{ "decompose", lmat_decompose },
+		{ "rot", lmat_rot },
 		{ NULL, NULL },
 	};
 	create_meta(L, l, "matrix", lmat_tostring);

@@ -247,7 +247,7 @@ matrix44_from_quaternion(union matrix44 *m, const struct quaternion *q) {
 }
 
 static inline union matrix44 *
-matrix44_trans(union matrix44 *m, float x, float y, float z) {
+matrix44_transmat(union matrix44 *m, float x, float y, float z) {
 	matrix44_identity(m);
 	C[3][0] = x;
 	C[3][1] = y;
@@ -257,7 +257,16 @@ matrix44_trans(union matrix44 *m, float x, float y, float z) {
 }
 
 static inline union matrix44 *
-matrix44_scale(union matrix44 *m, float x, float y, float z) {
+matrix44_trans(union matrix44 *m, float x, float y, float z) {
+	C[3][0] += x;
+	C[3][1] += y;
+	C[3][2] += z;
+
+	return m;
+}
+
+static inline union matrix44 *
+matrix44_scalemat(union matrix44 *m, float x, float y, float z) {
 	matrix44_identity(m);
 	C[0][0] = x;
 	C[1][1] = y;
@@ -267,7 +276,24 @@ matrix44_scale(union matrix44 *m, float x, float y, float z) {
 }
 
 static inline union matrix44 *
-matrix44_rot(union matrix44 *m, float x, float y, float z) {
+matrix44_scale(union matrix44 *m, float x, float y, float z) {
+	C[0][0] *= x;
+	C[0][1] *= y;
+	C[0][2] *= z;
+
+	C[1][0] *= x;
+	C[1][1] *= y;
+	C[1][2] *= z;
+
+	C[2][0] *= x;
+	C[2][1] *= y;
+	C[2][2] *= z;
+
+	return m;
+}
+
+static inline union matrix44 *
+matrix44_rotmat(union matrix44 *m, float x, float y, float z) {
 	// Rotation order: YXZ [* Vector]
 	struct quaternion q;
 	quaternion_init(&q, x, y, z);
@@ -378,6 +404,17 @@ matrix44_mul(union matrix44 *m, const union matrix44 *m1, const union matrix44 *
 	*m = mf;
 
 	return m;
+}
+
+static inline union matrix44 *
+matrix44_rot(union matrix44 *m, float x, float y, float z) {
+	// Rotation order: YXZ [* Vector]
+	struct quaternion q;
+	quaternion_init(&q, x, y, z);
+
+	union matrix44 tmp;
+	matrix44_from_quaternion(&tmp, &q);
+	return matrix44_mul(m, &tmp, m);
 }
 
 // vector * matrix

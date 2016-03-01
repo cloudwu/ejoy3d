@@ -46,29 +46,4 @@ local function vecnew(...)
 	end
 end
 
-function matrix.transmat(x,y,z)
-	local tmp = vecnew(x,y,z)
-	local ret =  tmp:transmat(matrix.new())
-	set(veccache, tmp)
-	return ret
-end
-
-function matrix.scalemat(x,y,z)
-	local tmp = vecnew(x,y,z)
-	local ret = tmp:scalemat(matrix.new())
-	set(veccache, tmp)
-	return ret
-end
-
-function matrix.rotmat(x,y,z)
-	local tmp = vecnew(x,y,z)
-	local ret = tmp:rotmat(matrix.new())
-	set(veccache, tmp)
-	return ret
-end
-
-function matrix.invmat(m)
-	return matrix.new():inverted(m)
-end
-
 return matrix
